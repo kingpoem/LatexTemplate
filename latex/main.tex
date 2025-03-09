@@ -1,0 +1,58 @@
+\documentclass{article}     % 文档类型
+\usepackage{ctex}           % 中文支持
+\usepackage{palatino}       % 使用Palatino字体
+\usepackage{fontspec}       % 添加字体配置支持
+\usepackage{lipsum}         % 生成虚拟文本
+\usepackage{booktabs}       % 绘制高质量表格
+\usepackage{lastpage}       % 获取最后一页信息
+\usepackage{import}         % 支持子文件导入
+\usepackage{tocloft}        % 目录格式控制
+\usepackage{hyperref}       % 超链接支持（必须在tocloft之后加载）
+\usepackage{bookmark}       % 书签支持
+\usepackage{indentfirst}    % 首段自动缩进
+\usepackage{setspace}       % 行间距调整
+\usepackage{amsmath}        % 数学公式支持
+\usepackage{amssymb}        % 数学符号支持
+\usepackage{listings}       % 代码插入支持
+\usepackage{float}          % 浮动体控制
+\usepackage{algorithm}      % 算法环境支持
+\usepackage{algorithmic}    % 算法伪代码语法
+\usepackage{tikz}           % 矢量绘图工具
+\usepackage{enumitem}       % 列表格式控制
+\usepackage{geometry}       % 页面布局控制
+\geometry{
+    textwidth=18cm,         % 文本宽度
+    marginparwidth=3cm      % 边栏宽度
+}
+\newcommand{\arr}{          % 自定义命令，用于插入箭头
+    \begin{tikzpicture}
+        \draw[white,fill=black] (0,0)--(.4em,0)--(-.18em,-.32em)--(0,0);
+        \draw (0,0)--(-.18em,-.32em)--(.4em,0)--(-.18em,.32em)--(0,0);
+		\draw (0,0)--(.4em,0);
+	\end{tikzpicture}
+}
+\setlength{\headheight}{10pt}                           % 页眉高度
+\setlength{\parindent}{2em}                             % 首行缩进
+\setlength{\cftbeforesecskip}{1.0em}                    % 调节 section 之间的距离
+\renewcommand{\abstractname}{\Large 摘要\\}             % abstract 文章自带的标题很小，需要自定义来放大
+\renewcommand{\cfttoctitlefont}{\hfil\Large\bfseries}  % 核心弹性填充
+\renewcommand{\cftaftertoctitle}{\hfil}                % 对称填充
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}  % 保留点号样式
+
+\renewcommand{\cftsecpagefont}{\rmfamily}               % 目录页字体 对页码起作用
+\renewcommand*\contentsname{\hfill 目录 \hfill}     % 命令重定义，目录页标题居中
+\providecommand{\keywords}[1]{\textbf{关键词：}#1}      % 自定义命令，用于插入关键词 article格式不自带
+\title{}
+\author{}
+
+\begin{document}
+
+\import{./latex/sections/}{Content.tex}
+\import{./latex/sections/}{Restatement.tex}
+\import{./latex/sections/}{Premise.tex}
+\import{./latex/sections/}{Notation.tex}
+\import{./latex/sections/}{Model.tex}
+\import{./latex/sections/}{Problem2.tex}
+\import{./latex/sections/}{Appendix.tex}
+
+\end{document}

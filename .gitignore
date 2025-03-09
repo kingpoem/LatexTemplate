@@ -1,0 +1,29 @@
+build/
+out/
+
+# latex compile cache
+*.aux
+*.log
+*.out
+*.bcf
+*.blg
+*.toc
+*.run.xml
+*.snm
+*.fdb_latexmk
+*.fls
+
+# python runtime cache
+__pycache__/
+report.log
+swanlog/
+.ruff_cache/
+
+# large files
+*.pdf
+*.png
+*.jpg
+*.jpeg
+
+# other
+sections/
