@@ -32,6 +32,9 @@ endif
 	@$(XETEXC) --output-directory=$(OUTPUT_DIR) $(PAPER_BUILD_SOURCE)	# 四次编译
 	$(_clean)
 
+preview:
+	@xdg-open ./out/main.pdf
+
 clean :
 	$(_clean)
 
