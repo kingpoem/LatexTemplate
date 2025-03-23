@@ -3,16 +3,24 @@
 在建模过程中，我们做出以下基本假设：
 
 \begin{itemize}
-    \item \textbf{假设1}：汽车通过路障时的速度为零
+    \item \textbf{假设1}（连续性）：生产周期$T \in \mathbb{R}^+$和产量$Q \in C^1(\mathbb{R}^+)$均为连续可导量，满足微分关系：
+        \[
+        \frac{dQ}{dt} = r,\quad \forall t \in [0,T]
+        \]
     
-    该假设确保每个路障都能有效重置车辆运动状态，符合强制减速的设计目标。
-
-    \item \textbf{假设2}：汽车通过路障后做等加速运动
+    \item \textbf{假设2}（需求稳定）：产品需求率为常数$r > 0$，满足：
+        \[
+        \int_{0}^{T} r dt = Q
+        \]
     
-    基于车辆动力系统的物理特性，假设恒定加速度便于建立运动学方程。
-
-    \item \textbf{假设3}：汽车达到限速$v_{\max}$时立即开始减速运动
+    \item \textbf{假设3}（成本结构）：成本函数$C(Q,T)$满足：
+        \[
+        C(Q,T) = \underbrace{c_1}_{\text{准备费}} + \underbrace{\frac{1}{2}c_2 Q T}_{\text{贮存费}}
+        \]
+        其中$c_1,c_2 > 0$为成本系数
     
-    该假设保证车辆在达到最高允许速度后立即进入制动阶段，符合安全驾驶规范。
-
+    \item \textbf{假设4}（瞬时补货）：当库存量$I(t) \to 0^+$时，存在：
+        \[
+        \lim_{t\to T^-} I(t) = Q
+        \]
 \end{itemize}

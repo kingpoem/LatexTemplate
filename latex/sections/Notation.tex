@@ -1,33 +1,28 @@
-\section{收集数据}\label{sec:Notation}
-
-\textbf{参数获取方法}：通过实地测试获取加速度$a_1$和减速度$a_2$，测试条件包括：
-\begin{itemize}[leftmargin=2em]
-    \item 使用普通家用轿车在平整沥青路面进行
-    \item 由经验司机完成加速/减速操作
-    \item 副驾驶助手记录速度-时间对应数据
-    \item 测试重复3次取平均值
-\end{itemize}
+\section{符号说明}\label{sec:Notation}
 
 \begin{table}[H]
     \centering
-    \caption{加速行驶测试数据}
-    \label{tab:accel_data}
-    \begin{tabular}{ccccc}
+    \caption{模型参数符号说明}
+    \label{tab:model_symbols}
+    \begin{tabular}{lc}
         \toprule
-        速度 (km·h$^{-1}$) & 0 & 10 & 20 & 40 \\
-        时间 (s) & 0 & 1.6 & 3.0 & 5.0 \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-\begin{table}[H]
-    \centering
-    \caption{减速行驶测试数据}
-    \label{tab:decel_data}
-    \begin{tabular}{ccccc}
-        \toprule
-        速度 (km·h$^{-1}$) & 40 & 30 & 20 & 0 \\
-        时间 (s) & 0 & 2.2 & 4.0 & 6.8 \\
+        符号 & 解释 \\
+        \midrule
+        $T$ & 生产周期 \\
+        $Q$ & 产量 \\
+        $r$ & 产品每天需求量 \\
+        $R$ & 使贮存量恢复到$Q$的补货量 \\
+        $c_1$ & 每天生产准备费 \\
+        $c_2$ & 每天每件产品的贮存费 \\
+        $c_3$ & 每天每件产品缺货损失费 \\
+        $q(t)$ & 贮存量关于时间$t$的函数 \\
+        $\overline{C}$ & 一个周期的总费用 \\
+        $C(T)$ & 每天的平均总成本费用 \\
+        $\theta$ & 购买单位货物本身的费用 \\
+        $\overline{C}_{\theta}$ & 加上购买成本的一个周期的总费用 \\
+        $C(T)_{\theta}$ & 加上购买成本的每天的平均总成本费用 \\
+        $T^{*}$ & 生产周期最优解 \\
+        $Q^{*}$ & 产量最优解 \\
         \bottomrule
     \end{tabular}
 \end{table}
