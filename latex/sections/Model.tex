@@ -1,1 +1,115 @@
 \section{模型建立}
+\section*{无风情况建模}
+根据假设条件3、4，建立火势变化率微分方程：
+\begin{equation}\label{eq:fire_rate}
+    \frac{\mathrm{d}B}{\mathrm{d}t} = 
+    \begin{cases}
+        \beta t, & 0 \leq t \leq t_1 \\
+        \beta t - \lambda X, & t_1 < t < t_2
+    \end{cases}
+\end{equation}
+
+积分计算总烧毁面积时，几何解释为：
+\begin{equation}\label{eq:area_integral}
+    B(t_{2}) = \int_{0}^{t_{2}} \frac{\mathrm{d}B}{\mathrm{d}t}\mathrm{d}t = \frac{1}{2}bt_{2}
+\end{equation}
+
+\begin{center}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{./latex/figure/fire_spread}
+    \caption{火势变化率动态示意图}
+    \label{fig:fire_spread}
+\end{figure}
+\end{center}
+
+图示呈现火势变化率$\frac{\mathrm{d}B}{\mathrm{d}t}$在两个阶段的动态特征：
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{自然蔓延阶段}（$t \in [0, t_1]$）：火势变化率线性增长，满足$\frac{\mathrm{d}B}{\mathrm{d}t} = \beta t$
+    \item \textbf{救援干预阶段}（$t \in [t_1, t_2]$）：火势变化率线性递减，满足$\frac{\mathrm{d}B}{\mathrm{d}t} = \beta t - \lambda X$
+\end{itemize}
+
+记$t = t_{1}$时$\frac{dB}{dt} = b$。烧毁面积$B(t_{2}) = \int_{0}^{t_{2}} \frac{dB}{dt}dt$为图中三角形的面积，有$B(t_{2}) = \frac{1}{2}bt_{2}$。
+
+% 时间关系式
+\begin{equation}\label{eq:time_relation}
+    t_{2} - t_{1} = \frac{\beta t_{1}}{\lambda^{\theta}X - \beta}
+\end{equation}
+
+总烧毁面积公式包含自然蔓延和救援干预两部分贡献：
+\begin{equation}\label{eq:total_area}
+    B(t_{2}) = \underbrace{\frac{\beta t_{1}^{2}}{2}}_{\text{自然蔓延}} + \underbrace{\frac{\beta^{2} t_{1}^{2}}{2(\lambda^{\theta}X - \beta)}}_{\text{救援减损}}
+\end{equation}
+
+救援总费用模型建立时考虑三方面成本：
+\begin{equation}\label{eq:cost_model}
+    C(X) = \underbrace{c_{1}B(t_2)}_{\text{损失成本}} + \underbrace{\frac{c_{2}\beta t_{1}X}{\lambda^{\theta}X - \beta}}_{\text{时间成本}} + \underbrace{c_{3}X}_{\text{人力成本}}
+\end{equation}
+
+\section*{有风情况建模}
+当风速不可忽略时，建立运动扩散模型。设圆心运动轨迹：
+\begin{equation}\label{eq:fire_center}
+    (x - vt)^2 + y^2 = (\beta t)^2
+\end{equation}
+
+应用Green定理计算扫掠面积时，需分解为包络线和圆弧两部分：
+\begin{equation}\label{eq:green_area}
+    A = \frac{1}{2}\oint_{C} (x\,\mathrm{d}y - y\,\mathrm{d}x) = \underbrace{I_1}_{\text{包络线贡献}} + \underbrace{I_2}_{\text{圆弧贡献}}
+\end{equation}
+
+最终费用模型体现风速影响因子：
+\begin{equation}\label{eq:wind_cost}
+    C(X) = c_1(A_1 + A_2 - \pi (\beta t_1)^2) + \frac{c_2 \beta t_1 X}{\lambda^{\theta}X - \beta} + c_3 X
+\end{equation}
+
+% ========== 原有内容优化后 ==========
+\section*{关键参数关系}
+火灾扑灭时间$t_2$与消防力量$X$呈双曲线关系，由式\eqref{eq:time_relation}可知：
+\begin{equation}\label{eq:extinguish_time}
+    t_2 \propto \frac{1}{\lambda^{\theta}X - \beta}
+\end{equation}
+
+最优解表达式揭示临界条件：
+\begin{equation}\label{eq:optimal_condition}
+    X_{\text{opt}} = \frac{(b+\Delta)\beta}{k} \left( \frac{1}{\lambda} + \sqrt{\frac{c_1 k \lambda t_1^2}{2c_3 (b+\Delta)} + \frac{c_2}{c_3}t_1} \right)
+\end{equation}
+其中平方根项反映成本权衡机制，当$c_3$（人力成本）增大时，最优人数$X$会相应减少。
+
+\section*{有风情况特殊情形}
+当$v > \beta$时，火场呈现拉长椭圆形态，此时：
+\begin{equation}\label{eq:envelope_equation}
+    y = \pm\frac{\beta}{\sqrt{v^2 - \beta^2}}x
+\end{equation}
+该包络线方程显示火势前沿的渐近线特性，当$v \gg \beta$时，包络线趋近于直线$y = \pm(\beta/v)x$。
+
+\section{模型求解}
+\subsection*{无风情况最优解}
+通过极值条件确定最优消防力量：
+\begin{equation}\label{eq:windless_optimal}
+    \frac{\mathrm{d}C}{\mathrm{d}X} = 0
+\end{equation}
+
+解得应派队员人数：
+\begin{equation}\label{eq:windless_solution}
+    X = \frac{(b + \Delta)\beta}{k} \left( \frac{1}{\lambda} + \sqrt{\frac{c_1 k \lambda t_1^2}{2c_3 (b + \Delta)} + \frac{c_2}{c_3}t_1} \right)
+\end{equation}
+
+\subsection*{有风情况分析}
+当火势扩散速度$v > \beta$时，解的形式为：
+\begin{equation}\label{eq:wind_solution}
+    X = \frac{b + \Delta}{k\lambda}\left(\beta + \sqrt{\frac{2c_1\beta t_1\sqrt{v^2 - \delta^2} + c_2\beta^2t_1}{c_3}} \right)
+\end{equation}
+其中$\delta = \frac{k\lambda}{b+\Delta}X - \beta$表征消防力量对火势的抑制强度。
+
+\section{结论}
+\begin{itemize}
+    \item \textbf{常规火情}（无风或$v \leq \beta$）：
+    \begin{equation}\label{eq:general_solution}
+        X = \frac{(b+\Delta)\beta}{k}\left(\frac{1}{\lambda} + \sqrt{\frac{c_1k\lambda t_1^2}{2c_3(b + \Delta)} + \frac{c_2}{c_3}t_1}\right)
+    \end{equation}
+
+    \item \textbf{强风火情}（$v > \beta$）：
+    \begin{equation}\label{eq:strong_wind_solution}
+        X = \frac{b+\Delta}{k\lambda}\left(\beta + \sqrt{\frac{2c_1\beta t_1\sqrt{v^2 - \delta^2} + c_2\beta^2t_1}{c_3}}\right)
+    \end{equation}
+\end{itemize}
