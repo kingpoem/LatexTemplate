@@ -1,47 +1,9 @@
 \section{模型假设}\label{sec:Premise}
 
-在森林火灾救援问题中，我们做出以下基本假设：
-
 \begin{itemize}[leftmargin=2em]
     \item \textbf{假设1}（损失费用）：损失费用$L$与最终烧毁面积$B(t_2)$成正比，即
         \begin{equation}
             L = c_1 B(t_2)
         \end{equation}
         其中$c_1$为烧毁单位面积的损失费用系数。
-
-    \item \textbf{假设2}（灭火速度）：消防队员灭火速度$\lambda$与初始火势$b$满足
-        \begin{equation}
-            \lambda(\theta) = \frac{k}{b + \Delta}
-        \end{equation}
-        其中$k$为灭火能力系数，$\Delta$为防止分母过小的修正量，$\theta$为火势方向参数。
-
-    \item \textbf{假设3}（火势蔓延）：无风情况下，$t \in [0, t_1]$时火势蔓延速率满足
-        \begin{equation}
-            \frac{dB}{dt} = \beta t
-        \end{equation}
-        其中$\beta$为火势蔓延基础速率，该假设源于圆形蔓延模型$B(t) \propto t^2$。
-
-    \item \textbf{假设4}（救援效果）：派出$x$名消防队员后，$t \in [t_1, t_2]$时火势蔓延速率修正为
-        \begin{equation}
-            \frac{dB}{dt} = \beta t - \lambda x
-        \end{equation}
-        其中$\lambda$需满足$\lambda x > \beta t_1$以保证灭火可行性。
-
-    \item \textbf{假设5}（费用结构）：总救援费用包含时间相关费用和固定支出
-        \begin{equation}
-            C = c_2 x (t_2 - t_1) + c_3 x
-        \end{equation}
-        其中$c_2$为单位时间人力成本，$c_3$为人均固定成本。
-
-    \item \textbf{假设6}（几何蔓延）：无风时烧毁面积满足
-        \begin{equation}
-            B(t) = \pi (v t)^2 \implies \frac{dB}{dt} = 2\pi v^2 t
-        \end{equation}
-        其中$v$为火势径向蔓延速度，该模型在风速小于3m/s时成立。
-
-    \item \textbf{假设7}（风场影响）：当风速$w \geq 5$m/s时，蔓延模型修正为
-        \begin{equation}
-            \frac{dB}{dt} = \beta t \cdot (1 + \gamma w^2)
-        \end{equation}
-        其中$\gamma$为风场耦合系数，该修正项仅在主风方向与救援通道夹角$<45^\circ$时适用。
 \end{itemize}

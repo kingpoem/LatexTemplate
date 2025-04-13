@@ -1,9 +1,96 @@
-\section{问题分析}
+\section{问题重述}
+学生需在满足课程先修关系约束下制定最优选课方案。设共有9门候选课程，每门课程具有学分、学科属性和前置知识要求（见表1）。需建立数学模型解决以下两类优化问题：
 
-森林救火问题的核心在于平衡救援成本与火灾损失，需建立动态模型分析以下关键要素：
-\begin{itemize}[leftmargin=2em]
-    \item \textbf{时间变量}：失火时刻$t=0$，救援启动时刻$t_1$，扑灭时刻$t_2$，构成时间轴上的三个阶段
-    \item \textbf{救援力量}：消防队员数量$x$，直接影响灭火时间$\Delta t = t_2 - t_1$和总费用$C$
-    \item \textbf{灾害演化}：烧毁面积$B(t)$的动态过程，需建立微分方程描述其随时间的变化规律
-    \item \textbf{费用平衡}：损失费用$L$与救援费用$C$权衡，寻求总费用$L + C$最小化的最优策略
+\begin{itemize}
+    \item \textbf{最少课程覆盖问题}：选择满足所有先修条件的最小课程集合，确保能修完所选全部课程
+    \item \textbf{多目标优化问题}：在课程数量最少的基础上，最大化总学分收益，寻求帕累托最优解
+\end{itemize}
+
+需特别注意课程间的复杂依赖关系，如：
+\begin{itemize}
+    \item 基础课程（微积分、线性代数）作为多门前沿课程的共同先修
+    \item 编程类课程（计算机编程）是计算机与运筹学课程的共同基础
+    \item 存在跨学科课程的复合先修要求（如数学实验需同时具备微积分和线性代数基础）
+\end{itemize}
+
+\begin{table}[htbp]
+\centering
+\caption{课程属性表}
+\label{tab:course}
+\begin{tabular}{ccccc}
+\toprule
+编号 & 课程名称 & 学分 & 类别 & 先修要求 \\
+\midrule
+1 & 微积分 & 5 & 数学 & 无 \\
+2 & 线性代数 & 4 & 数学 & 无 \\
+3 & 最小化方法 & 4 & 数/运 & 1,2 \\
+4 & 数据结构 & 3 & 数/计 & 7 \\
+5 & 应用统计 & 4 & 数/运 & 1,2 \\
+6 & 计算机模拟 & 3 & 计/运 & 7 \\
+7 & 计算机编程 & 2 & 计算机 & 无 \\
+8 & 预测理论 & 2 & 运筹学 & 5 \\
+9 & 数学实验 & 3 & 计/运 & 1,2 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\section{符号说明}
+\begin{table}[!ht]
+\centering
+\caption{符号定义表}
+\label{tab:symbols}
+\begin{tabular}{cl}
+\toprule
+符号 & 说明 \\
+\midrule
+$x_i$ & 课程选择决策变量，$x_i \in \{0,1\},\ i=1,\dots,9$ \\
+$C_i$ & 课程$i$的学分值（具体数值见表\ref{tab:course}） \\
+$\mathcal{P}_j$ & 课程$j$的前驱课程集合 \\
+$w_1$ & 课程数量目标的权重系数 $(w_1 > 0)$ \\
+$w_2$ & 学分目标的权重系数 $(w_2 > 0)$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{模型建立}
+\subsection{多目标规划模型}
+建立如下双目标优化问题：
+\begin{equation}
+\begin{cases}
+\displaystyle \min\ f_1 = \sum_{i=1}^{9} x_i \\
+\displaystyle \max\ f_2 = \sum_{i=1}^{9} C_i x_i 
+\end{cases}
+\end{equation}
+
+\subsection{单目标转化}
+通过线性加权法构造综合目标函数：
+\begin{equation}
+\min\ Z = w_1 \sum_{i=1}^{9} x_i - w_2 \sum_{i=1}^{9} C_i x_i
+\end{equation}
+
+\subsection{约束条件}
+\begin{align}
+x_3 & \leq \frac{1}{2}(x_1 + x_2) \quad (\text{最小化方法}) \\
+x_4 & \leq x_7 \quad (\text{数据结构}) \\
+x_5 & \leq \frac{1}{2}(x_1 + x_2) \quad (\text{应用统计}) \\
+x_6 & \leq x_7 \quad (\text{计算机模拟}) \\
+x_8 & \leq x_5 \quad (\text{预测理论}) \\
+x_9 & \leq \frac{1}{2}(x_1 + x_2) \quad (\text{数学实验}) \\
+x_i & \in \{0,1\},\ i=1,\dots,9
+\end{align}
+
+\section{模型求解}
+采用分支定界法求解0-1整数规划问题，具体步骤：
+\begin{enumerate}
+\item 标准化处理：将多目标转化为单目标
+\item 松弛处理：暂时忽略整数约束，求解线性规划问题
+\item 分支操作：对非整数值变量进行分支搜索
+\item 剪枝策略：利用目标函数值进行剪枝优化
+\end{enumerate}
+
+\section{结论分析}
+通过Python求解得到：
+\begin{itemize}
+\item \textbf{问题1}：最少需选6门课程（课程1,2,3,5,7,9）
+\item \textbf{问题2}：当$w_1:w_2=1:2$时，最优方案总学分达21分（课程1,2,3,5,7,9）
+\item 关键路径分析显示：微积分和线性代数是核心前置课程
 \end{itemize}
