@@ -1,70 +1,98 @@
-import pulp
+from pulp import LpProblem, LpMinimize, LpVariable, lpSum, LpBinary, value
 
-courses = [
-    {'id':1, 'name':'微积分', '学分':5, '类别':'数学', '先修课':[]},
-    {'id':2, 'name':'线性代数', '学分':4, '类别':'数学', '先修课':[]},
-    {'id':3, 'name':'最优化方法', '学分':3, '类别':'运筹学', '先修课':[7]},
-    {'id':4, 'name':'数据结构', '学分':3, '类别':'计算机', '先修课':[]},
-    {'id':5, 'name':'应用统计', '学分':3, '类别':'数学', '先修课':[]},
-    {'id':6, 'name':'计算机模拟', '学分':3, '类别':'运筹学', '先修课':[]},
-    {'id':7, 'name':'计算机编程', '学分':2, '类别':'计算机', '先修课':[]},
-    {'id':8, 'name':'预测理论', '学分':3, '类别':'运筹学', '先修课':[5]},
-    {'id':9, 'name':'数学实验', '学分':3, '类别':'数学', '先修课':[]}
-]
+# 数据
+courses = ["微积分", "线性代数", "最优化方法", "数据结构", "应用统计", "计算机概况", "计算机编程", "预测理论", "数学实验"]
+credits = [5, 4, 4, 4, 4, 3, 2, 2, 3]  # 学分
+math = [1, 1, 1, 0, 1, 0, 0, 0, 1]     # 是否数学课
+operations = [0, 0, 1, 0, 1, 1, 0, 1, 1]  # 是否运筹学课
+computer = [0, 0, 0, 1, 0, 1, 1, 0, 0]  # 是否计算机课
 
-def build_model(phase=1):
-    """构建优化模型"""
-    prob = pulp.LpProblem("CourseSelection", pulp.LpMinimize if phase==1 else pulp.LpMaximize)
-    
-    # 创建决策变量
-    x = {c['id']: pulp.LpVariable(f"x{c['id']}", cat='Binary') for c in courses}
-    
-    # 目标函数
-    if phase == 1:
-        prob += pulp.lpSum(x.values())  # 最小化课程数
-    else:
-        prob += pulp.lpSum(c['学分']*x[c['id']] for c in courses)  # 最大化学分
-    
-    # 公共约束条件
-    math = [c['id'] for c in courses if c['类别'] == '数学']
-    ors = [c['id'] for c in courses if c['类别'] == '运筹学']
-    cs = [c['id'] for c in courses if c['类别'] == '计算机']
-    
-    prob += pulp.lpSum(x[m] for m in math) >= 2    # 数学至少2门
-    prob += pulp.lpSum(x[o] for o in ors) >= 3     # 运筹学至少3门
-    prob += pulp.lpSum(x[c] for c in cs) >= 2      # 计算机至少2门
-    
-    # 先修课约束
-    for c in courses:
-        for p in c['先修课']:
-            prob += x[c['id']] <= x[p]  # 选修课程c必须先修p
-    
-    # 二阶段额外约束
-    if phase == 2:
-        # 添加课程数等于第一阶段最优解的约束
-        min_courses = sum(var.value() for var in x.values())
-        prob += pulp.lpSum(x.values()) == min_courses
-    
-    return prob, x
+# 选修依赖关系 (i 依赖 j 表示 R[i][j] = 1)
+R = [[0 for _ in range(9)] for _ in range(9)]
+R[0][1] = 1  # 微积分 依赖 线性代数
+R[1][0] = 1  # 线性代数 依赖 微积分
+R[2][1] = 1  # 最优化方法 依赖 线性代数
+R[3][6] = 1  # 数据结构 依赖 计算机编程
+R[5][1] = 1  # 计算机概况 依赖 线性代数
+R[8][1] = 1  # 数学实验 依赖 线性代数
 
-# 第一阶段：最小化课程数
-prob1, x1 = build_model(phase=1)
-prob1.solve(pulp.PULP_CBC_CMD(msg=False))
+# 第一问：最小学分
+prob1 = LpProblem("Course_Selection_Min_Credits", LpMinimize)
 
-# 解析第一阶段结果
-selected_phase1 = [c for c in courses if x1[c['id']].value() == 1]
-print("问题一：最少选修课程方案")
-print(f"课程数: {len(selected_phase1)}")
-print("选课列表:", [c['name'] for c in selected_phase1])
-print("总学分:", sum(c['学分'] for c in selected_phase1))
+# 决策变量：是否选择课程 i
+x = [LpVariable(f"x_{i}", cat=LpBinary) for i in range(9)]
 
-# # 第二阶段：最大化学分
-# prob2, x2 = build_model(phase=2)
-# prob2.solve(pulp.PULP_CBC_CMD(msg=False))
+# 目标函数：最小化学分
+prob1 += lpSum(credits[i] * x[i] for i in range(9))
 
-# # 解析第二阶段结果
-# selected_phase2 = [c for c in courses if x2[c['id']].value() == 1]
-# print("\n问题二：最少课程下的最高学分方案")
-# print(f"课程数: {len(selected_phase2)}")
-# print("选课列表:", [c['name'] for c in selected_phase2])
-# print("总学分:", sum(c['学分'] for c in selected_phase2))
+# 约束条件
+# 至少两门数学课
+prob1 += lpSum(math[i] * x[i] for i in range(9)) >= 2
+# 至少三门运筹学课
+prob1 += lpSum(operations[i] * x[i] for i in range(9)) >= 3
+# 至少两门计算机课
+prob1 += lpSum(computer[i] * x[i] for i in range(9)) >= 2
+# 选修依赖约束
+for i in range(9):
+    for j in range(9):
+        if R[i][j] == 1:
+            prob1 += x[i] <= x[j]
+
+# 求解
+prob1.solve()
+
+# 输出结果
+print("第一问：最优选课方案（最小学分）")
+selected_courses = [i for i in range(9) if value(x[i]) == 1]
+total_credits = sum(credits[i] for i in selected_courses)
+print("选择的课程：", [courses[i] for i in selected_courses])
+print("总学分：", total_credits)
+
+# 第二问：最小化每天学习压力
+prob2 = LpProblem("Course_Selection_Min_Pressure", LpMinimize)
+
+# 决策变量
+x = [LpVariable(f"x_{i}", cat=LpBinary) for i in range(9)]  # 是否选择课程 i
+d = [[LpVariable(f"d_{i}_{k}", cat=LpBinary) for k in range(5)] for i in range(9)]  # 课程 i 是否在第 k 天学习
+z = LpVariable("z")  # 辅助变量，表示每天学习压力的最大值
+
+# 目标函数：最小化每天学习压力的最大值
+prob2 += z
+
+# 约束条件
+# 课程类别约束（同第一问）
+prob2 += lpSum(math[i] * x[i] for i in range(9)) >= 2
+prob2 += lpSum(operations[i] * x[i] for i in range(9)) >= 3
+prob2 += lpSum(computer[i] * x[i] for i in range(9)) >= 2
+for i in range(9):
+    for j in range(9):
+        if R[i][j] == 1:
+            prob2 += x[i] <= x[j]
+
+# 每天学习压力约束
+for k in range(5):
+    daily_pressure = lpSum(credits[i] * d[i][k] for i in range(9))
+    prob2 += daily_pressure * daily_pressure <= z
+
+# 每门课恰好安排一天
+for i in range(9):
+    prob2 += lpSum(d[i][k] for k in range(5)) == x[i]
+
+# 每天最多 3 门课
+for k in range(5):
+    prob2 += lpSum(d[i][k] for i in range(9)) <= 3
+
+# 求解
+prob2.solve()
+
+# 输出结果
+print("\n第二问：最优选课方案（最小化每天学习压力）")
+selected_courses = [i for i in range(9) if value(x[i]) == 1]
+print("选择的课程：", [courses[i] for i in selected_courses])
+print("总学分：", sum(credits[i] for i in selected_courses))
+print("每天安排：")
+for k in range(5):
+    day_courses = [i for i in range(9) if value(d[i][k]) == 1]
+    day_credits = sum(credits[i] for i in day_courses)
+    print(f"第 {k+1} 天：{[courses[i] for i in day_courses]}，学分：{day_credits}，压力：{day_credits**2}")
+print("最大压力：", value(z))

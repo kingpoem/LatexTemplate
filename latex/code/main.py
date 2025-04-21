@@ -1,51 +1,55 @@
-from pulp import LpVariable, LpProblem, LpMinimize, lpSum, LpStatus, PULP_CBC_CMD, value
+import pulp
 
+# 课程数据
 courses = {
-    1: {'name': '微积分', 'credit':5, 'pre':[]},
-    2: {'name': '线性代数', 'credit':4, 'pre':[]},
-    3: {'name': '最小化方法', 'credit':4, 'pre':[1,2]},
-    4: {'name': '数据结构', 'credit':3, 'pre':[7]},
-    5: {'name': '应用统计', 'credit':4, 'pre':[1,2]},
-    6: {'name': '计算机模拟', 'credit':3, 'pre':[7]},
-    7: {'name': '计算机编程', 'credit':2, 'pre':[]},
-    8: {'name': '预测理论', 'credit':2, 'pre':[5]},
-    9: {'name': '数学实验', 'credit':3, 'pre':[1,2]}
+    1: {'credit': 5, 'prerequisites': []},
+    2: {'credit': 4, 'prerequisites': []},
+    3: {'credit': 4, 'prerequisites': [1, 2]},
+    4: {'credit': 3, 'prerequisites': [7]},
+    5: {'credit': 4, 'prerequisites': [1, 2]},
+    6: {'credit': 3, 'prerequisites': [7]},
+    7: {'credit': 2, 'prerequisites': []},
+    8: {'credit': 2, 'prerequisites': [5]},
+    9: {'credit': 3, 'prerequisites': [1, 2]},
 }
 
-def build_model(weights=(0.5, 0.5)):
-    prob = LpProblem("Course_Selection", LpMinimize)
-    
-    x = LpVariable.dicts('x', courses.keys(), cat='Binary')
-    
-    total_courses = lpSum(x[c] for c in courses)
-    total_credits = lpSum(courses[c]['credit']*x[c] for c in courses)
-    prob += weights[0]*total_courses - weights[1]*total_credits
-    
-    for c in courses:
-        for preq in courses[c]['pre']:
-            prob += x[c] <= x[preq]
-    
-    return prob, x
+# 最少课程数求解
+model_min = pulp.LpProblem("Min_Courses", pulp.LpMinimize)
+x_min = {i: pulp.LpVariable(f'x_{i}', cat=pulp.LpBinary) for i in courses}
+model_min += pulp.lpSum(x_min[i] for i in courses)
+for i in courses:
+    for p in courses[i]['prerequisites']:
+        model_min += x_min[i] <= x_min[p]
+model_min.solve()
+k_min = int(pulp.value(model_min.objective))
+print(f"最少课程数: {k_min}")
+selected_min = [i for i in courses if x_min[i].value() == 1]
+print("选课方案:", selected_min)
 
-def solve_model(model, variables):
-    model.solve(PULP_CBC_CMD(msg=False))
-    
-    if LpStatus[model.status] != 'Optimal':
-        return None
-    
-    selected = [c for c in courses if value(variables[c]) > 0.5]
-    total_credits = sum(courses[c]['credit'] for c in selected)
-    return {
-        'courses': sorted(selected),
-        'total': len(selected),
-        'credits': total_credits
-    }
+# 多目标优化求解帕累托前沿
+pareto_front = []
+for k in range(k_min, 10):
+    model_max = pulp.LpProblem("Max_Credits", pulp.LpMaximize)
+    x_max = {i: pulp.LpVariable(f'x_{i}', cat=pulp.LpBinary) for i in courses}
+    model_max += pulp.lpSum(courses[i]['credit'] * x_max[i] for i in courses)
+    model_max += pulp.lpSum(x_max[i] for i in courses) == k
+    for i in courses:
+        for p in courses[i]['prerequisites']:
+            model_max += x_max[i] <= x_max[p]
+    status = model_max.solve()
+    if status == pulp.LpStatusOptimal:
+        credits = pulp.value(model_max.objective)
+        selected = [i for i in courses if x_max[i].value() == 1]
+        pareto_front.append((k, credits, selected))
 
-prob1, x1 = build_model(weights=(1, 0))
-result1 = solve_model(prob1, x1)
+# 筛选帕累托最优解
+pareto_optimal = []
+max_credit = -1
+for k, c, s in sorted(pareto_front, key=lambda x: x[0]):
+    if c > max_credit:
+        pareto_optimal.append((k, c, s))
+        max_credit = c
 
-prob2, x2 = build_model(weights=(1, 2)) 
-result2 = solve_model(prob2, x2)
-
-print(f"问题1结果：选课{result1['total']}门，课程{result1['courses']}，学分{result1['credits']}")
-print(f"问题2结果：选课{result2['total']}门，课程{result2['courses']}，学分{result2['credits']}")
+print("\n帕累托最优解:")
+for k, c, s in pareto_optimal:
+    print(f"课程数: {k}, 总学分: {c}, 选课方案: {s}")
