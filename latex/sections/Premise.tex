@@ -1,9 +1,14 @@
 \section{模型假设}\label{sec:Premise}
 
 \begin{itemize}[leftmargin=2em]
-    \item \textbf{假设1}（损失费用）：损失费用$L$与最终烧毁面积$B(t_2)$成正比，即
+    \item \textbf{人口增长假设}（恒定增长率）：单位时间人口增长率$r$为常数，即
         \begin{equation}
-            L = c_1 B(t_2)
+            \frac{\mathrm{d}N(t)}{\mathrm{d}t} = rN(t)
         \end{equation}
-        其中$c_1$为烧毁单位面积的损失费用系数。
+        其中$r$为人口增长速率常数，$N(t)$表示$t$时刻的人口数量。
+        
+    \item \textbf{初始条件}：设初始时刻$t_0$的人口规模为
+        \begin{equation}
+            N(t_0) = N_0
+        \end{equation}
 \end{itemize}

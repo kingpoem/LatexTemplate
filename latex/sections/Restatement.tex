@@ -1,96 +1,86 @@
 \section{问题重述}
-学生需在满足课程先修关系约束下制定最优选课方案。设共有9门候选课程，每门课程具有学分、学科属性和前置知识要求（见表1）。需建立数学模型解决以下两类优化问题：
-
+当研究国家/地区人口随时间变化规律时，需建立数学模型描述其增长趋势。基于1790-2000年美国人口数据，要求：
 \begin{itemize}
-    \item \textbf{最少课程覆盖问题}：选择满足所有先修条件的最小课程集合，确保能修完所选全部课程
-    \item \textbf{多目标优化问题}：在课程数量最少的基础上，最大化总学分收益，寻求帕累托最优解
+    \item 建立指数增长模型并进行参数估计
+    \item 验证模型对短期预测的适用性
+    \item 量化模型与实际数据的偏差
 \end{itemize}
 
-需特别注意课程间的复杂依赖关系，如：
-\begin{itemize}
-    \item 基础课程（微积分、线性代数）作为多门前沿课程的共同先修
-    \item 编程类课程（计算机编程）是计算机与运筹学课程的共同基础
-    \item 存在跨学科课程的复合先修要求（如数学实验需同时具备微积分和线性代数基础）
+\section{问题假设}\label{sec:Premise}
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{恒定增长率}：单位时间人口增长率$r$为常数，满足
+        \begin{equation}
+            \frac{\mathrm{d}x(t)}{\mathrm{d}t} = r x(t)
+        \end{equation}
+    \item \textbf{初始条件}：设初始时刻$t=0$（对应1790年）的人口规模为
+        \begin{equation}
+            x(0) = x_0
+        \end{equation}
 \end{itemize}
 
-\begin{table}[htbp]
-\centering
-\caption{课程属性表}
-\label{tab:course}
-\begin{tabular}{ccccc}
-\toprule
-编号 & 课程名称 & 学分 & 类别 & 先修要求 \\
-\midrule
-1 & 微积分 & 5 & 数学 & 无 \\
-2 & 线性代数 & 4 & 数学 & 无 \\
-3 & 最小化方法 & 4 & 数/运 & 1,2 \\
-4 & 数据结构 & 3 & 数/计 & 7 \\
-5 & 应用统计 & 4 & 数/运 & 1,2 \\
-6 & 计算机模拟 & 3 & 计/运 & 7 \\
-7 & 计算机编程 & 2 & 计算机 & 无 \\
-8 & 预测理论 & 2 & 运筹学 & 5 \\
-9 & 数学实验 & 3 & 计/运 & 1,2 \\
-\bottomrule
-\end{tabular}
-\end{table}
-\section{符号说明}
-\begin{table}[!ht]
-\centering
-\caption{符号定义表}
-\label{tab:symbols}
-\begin{tabular}{cl}
-\toprule
-符号 & 说明 \\
-\midrule
-$x_i$ & 课程选择决策变量，$x_i \in \{0,1\},\ i=1,\dots,9$ \\
-$C_i$ & 课程$i$的学分值（具体数值见表\ref{tab:course}） \\
-$\mathcal{P}_j$ & 课程$j$的前驱课程集合 \\
-$w_1$ & 课程数量目标的权重系数 $(w_1 > 0)$ \\
-$w_2$ & 学分目标的权重系数 $(w_2 > 0)$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\section{模型建立}
-\subsection{多目标规划模型}
-建立如下双目标优化问题：
-\begin{equation}
-\begin{cases}
-\displaystyle \min\ f_1 = \sum_{i=1}^{9} x_i \\
-\displaystyle \max\ f_2 = \sum_{i=1}^{9} C_i x_i 
-\end{cases}
+\section{模型建立}\label{sec:Model}
+人口指数增长模型的微分方程及其解析解：
+\begin{equation}\label{eq:diff_eq}
+    \left\{
+    \begin{aligned}
+        &\frac{dx}{dt} = r x, \\
+        &x(0) = x_0
+    \end{aligned}
+    \right.
 \end{equation}
-
-\subsection{单目标转化}
-通过线性加权法构造综合目标函数：
+求解得指数增长模型：
 \begin{equation}
-\min\ Z = w_1 \sum_{i=1}^{9} x_i - w_2 \sum_{i=1}^{9} C_i x_i
+    x(t) = x_0 e^{r t} \label{eq:exp_growth}
 \end{equation}
-
-\subsection{约束条件}
-\begin{align}
-x_3 & \leq \frac{1}{2}(x_1 + x_2) \quad (\text{最小化方法}) \\
-x_4 & \leq x_7 \quad (\text{数据结构}) \\
-x_5 & \leq \frac{1}{2}(x_1 + x_2) \quad (\text{应用统计}) \\
-x_6 & \leq x_7 \quad (\text{计算机模拟}) \\
-x_8 & \leq x_5 \quad (\text{预测理论}) \\
-x_9 & \leq \frac{1}{2}(x_1 + x_2) \quad (\text{数学实验}) \\
-x_i & \in \{0,1\},\ i=1,\dots,9
-\end{align}
+其中$t$以年为单位，$r>0$时为增长速率常数。
 
 \section{模型求解}
-采用分支定界法求解0-1整数规划问题，具体步骤：
+采用线性最小二乘法进行参数估计，具体步骤：
 \begin{enumerate}
-\item 标准化处理：将多目标转化为单目标
-\item 松弛处理：暂时忽略整数约束，求解线性规划问题
-\item 分支操作：对非整数值变量进行分支搜索
-\item 剪枝策略：利用目标函数值进行剪枝优化
+    \item \textbf{数据预处理}：将原始数据转换为相对时间$t = (year - 1790)$，人口数据取自然对数$y = \ln x$
+    
+    \item \textbf{建立线性模型}：
+    \begin{equation}
+        y = r t + \ln x_0 \label{eq:linear_model}
+    \end{equation}
+
+    \item \textbf{构建设计矩阵}：对$n$个数据点，构造
+    \begin{equation}
+        \mathbf{A} = \begin{bmatrix}
+            t_1 & 1 \\
+            t_2 & 1 \\
+            \vdots & \vdots \\
+            t_n & 1
+        \end{bmatrix}, \quad
+        \mathbf{y} = \begin{bmatrix}
+            y_1 \\ y_2 \\ \vdots \\ y_n
+        \end{bmatrix}
+    \end{equation}
+
+    \item \textbf{求解正规方程}：通过矩阵运算得到参数估计
+    \begin{equation}
+        \begin{bmatrix}
+            r \\ \ln x_0
+        \end{bmatrix} = (\mathbf{A}^T \mathbf{A})^{-1} \mathbf{A}^T \mathbf{y}
+    \end{equation}
+
+    \item \textbf{参数转换}：计算初始人口$x_0 = \exp(\ln x_0)$
 \end{enumerate}
 
-\section{结论分析}
-通过Python求解得到：
-\begin{itemize}
-\item \textbf{问题1}：最少需选6门课程（课程1,2,3,5,7,9）
-\item \textbf{问题2}：当$w_1:w_2=1:2$时，最优方案总学分达21分（课程1,2,3,5,7,9）
-\item 关键路径分析显示：微积分和线性代数是核心前置课程
-\end{itemize}
+\section{结论}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{./latex/figure/fitting}
+    \caption{population growth model fitting}
+    \label{fig:conclusion}
+\end{figure}
+
+模型最终求解结果：
+\begin{equation}
+    \left\{
+    \begin{aligned}
+        x_0 &= 6.0496 \\
+        r &= 0.2020\ \text{(每十年)}
+    \end{aligned}
+    \right.
+\end{equation}
