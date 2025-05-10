@@ -27,5 +27,12 @@
 - `make`：编译 PDF 文件，预览 PDF 文件，删除编译缓存文件
 - `make help`：显示所有命令信息
 
+## 环境配置
+
+Arch Linux 下配置环境：
+```bash
+sudo pacman -S texlive-core texlive-langcjk xelatex noto-fonts noto-fonts-cjk texlive-latexextra texlive-pictures texlive-science texlive-fontutils texlive-bibtexextra texlive-publishers texlive-music texlive-langchinese texlive-fontsextra texlive-fontspec
+```
+
 > [!IMPORTANT]
 > 引用文献时，命令需要使用 `make paper config=1`
