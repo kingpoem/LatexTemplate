@@ -1,27 +1,18 @@
 \section{模型建立}
 
-通过分析车辆运动学特征，建立如下路障间距模型：
+\subsection{经典Logistic方程}
+经典Logistic微分方程表示为：
+\begin{equation}
+\frac{dy}{dt} = ry\left(1-\frac{y}{K}\right)
+\end{equation}
 
-\begin{itemize}
-    \item \textbf{运动学方程}：
-    
-    定义加速阶段参数：
-    \begin{equation}\label{eq:s1}
-        s_1 = \frac{1}{2}a_1 t_1^2,\quad v_{\max} = a_1 t_1
-    \end{equation}
-    
-    减速阶段参数：
-    \begin{equation}\label{eq:s2}
-        s_2 = \frac{1}{2}a_2 t_2^2,\quad v_{\max} = a_2 t_2
-    \end{equation}
+其解析解为：
+\begin{equation}
+y(t) = \frac{K}{1+\left(\frac{K-N_0}{N_0}\right)e^{-rt}}
+\end{equation}
 
-    \item \textbf{总间距推导}：
-    联立式\eqref{eq:s1}和\eqref{eq:s2}消去时间参数$t_1,t_2$：
-    \begin{align}
-        s &= s_1 + s_2 \nonumber \\
-          &= \frac{v_{\max}^2}{2a_1} + \frac{v_{\max}^2}{2a_2} \nonumber \\
-          &= \frac{v_{\max}^2}{2}\left(\frac{1}{a_1} + \frac{1}{a_2}\right) \label{eq:final_model}
-    \end{align}
-\end{itemize}
-
-最终模型公式\eqref{eq:final_model}为路障间距设计的核心方程。
+\subsection{离散化处理}
+对于离散时间序列数据，采用差分形式：
+\begin{equation}
+\Delta y(t) = y(t+1)-y(t) = ry(t)\left(1-\frac{y(t)}{K}\right)
+\end{equation}

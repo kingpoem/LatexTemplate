@@ -1,1 +1,34 @@
-\section{模型计算}
+\section{模型求解}
+
+\subsection{参数估计方法}
+采用非线性最小二乘法估计参数$K$,$N_0$,$r$。目标函数为：
+\begin{equation}
+\min_{K,N_0,r}\sum_{i=1}^{n}\left[y_i-\frac{K}{1+\left(\frac{K-N_0}{N_0}\right)e^{-rt_i}}\right]^2
+\end{equation}
+
+\subsection{求解结果}
+通过Python编程实现得到以下参数估计值：
+\begin{table}[htbp]
+\centering
+\caption{Logistic模型参数估计结果}
+\begin{tabular}{ccc}
+\toprule
+\textbf{环境容纳量K} & \textbf{初始人口$N_0$} & \textbf{增长率r} \\
+\midrule
+14.52亿人 &5.4167亿人 &0.0285/年 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{拟合效果评估}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.8\textwidth]{./latex/figure/population}
+\caption{中国人口数据与Logistic模型拟合对比}
+\end{figure}
+
+拟合优度指标：
+\begin{itemize}
+\item $R^2=0.9976$
+\item RMSE=0.1194亿人
+\end{itemize}

@@ -1,33 +1,18 @@
-\section{收集数据}\label{sec:Notation}
-
-\textbf{参数获取方法}：通过实地测试获取加速度$a_1$和减速度$a_2$，测试条件包括：
-\begin{itemize}[leftmargin=2em]
-    \item 使用普通家用轿车在平整沥青路面进行
-    \item 由经验司机完成加速/减速操作
-    \item 副驾驶助手记录速度-时间对应数据
-    \item 测试重复3次取平均值
-\end{itemize}
+\section{符号表}\label{sec:Notation}
 
 \begin{table}[H]
     \centering
-    \caption{加速行驶测试数据}
-    \label{tab:accel_data}
-    \begin{tabular}{ccccc}
+    \caption{符号说明}
+    \begin{tabular}{cl}
         \toprule
-        速度 (km·h$^{-1}$) & 0 & 10 & 20 & 40 \\
-        时间 (s) & 0 & 1.6 & 3.0 & 5.0 \\
+        符号 & 解释 \\
+        \midrule
+        $t$   & 时间变量（单位：年） \\
+        $y(t)$ & 时刻$t$的人口数量（单位：亿人） \\
+        $K$    & 环境容纳量，即最大可能人口数（单位：亿人） \\
+        $N_0$  & 初始时刻人口数量（单位：亿人） \\
+        $r$    & 人口内禀增长率（单位：年$^{-1}$） \\
         \bottomrule
     \end{tabular}
-\end{table}
-
-\begin{table}[H]
-    \centering
-    \caption{减速行驶测试数据}
-    \label{tab:decel_data}
-    \begin{tabular}{ccccc}
-        \toprule
-        速度 (km·h$^{-1}$) & 40 & 30 & 20 & 0 \\
-        时间 (s) & 0 & 2.2 & 4.0 & 6.8 \\
-        \bottomrule
-    \end{tabular}
+    \label{tab:notation}
 \end{table}
