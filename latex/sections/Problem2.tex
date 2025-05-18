@@ -6,6 +6,37 @@
 \min_{K,N_0,r}\sum_{i=1}^{n}\left[y_i-\frac{K}{1+\left(\frac{K-N_0}{N_0}\right)e^{-rt_i}}\right]^2
 \end{equation}
 
+展开Logistic函数表达式：
+\begin{equation}
+N(t) = \frac{K}{1 + \left(\frac{K - N_0}{N_0}\right)e^{-rt}}
+\end{equation}
+
+建立残差函数：
+\begin{equation}
+r_i = y_i - N(t_i),\quad i=1,2,\cdots,n
+\end{equation}
+
+采用Levenberg-Marquardt算法进行数值优化，迭代公式：
+\begin{equation}
+\boldsymbol{\theta}^{(k+1)} = \boldsymbol{\theta}^{(k)} - (\mathbf{J}^\top\mathbf{J} + \lambda \mathbf{I})^{-1}\mathbf{J}^\top\mathbf{r}
+\end{equation}
+其中$\boldsymbol{\theta} = (K, N_0, r)^\top$为待估参数，$\mathbf{J}$为雅可比矩阵，$\lambda$为阻尼因子。
+
+\subsection{数值计算步骤}
+\begin{enumerate}
+\item 初始化参数：设$K^{(0)} = 15$亿，$N_0^{(0)} = 5$亿，$r^{(0)} = 0.05$
+\item 计算初始残差：$\mathbf{r}^{(0)} = [y_i - N(t_i;\boldsymbol{\theta}^{(0)})]$
+\item 迭代求解：
+\begin{itemize}
+\item 最大迭代次数：100次
+\item 收敛标准：$\|\mathbf{r}^{(k)}\|_2 < 10^{-6}$
+\end{itemize}
+\item 计算标准误差：
+\begin{equation}
+SE(\hat{\theta}_j) = \sqrt{\hat{\sigma}^2 [(\mathbf{J}^\top\mathbf{J})^{-1}]_{jj}}
+\end{equation}
+\end{enumerate}
+
 \subsection{求解结果}
 通过Python编程实现得到以下参数估计值：
 \begin{table}[htbp]
@@ -15,7 +46,7 @@
 \toprule
 \textbf{环境容纳量K} & \textbf{初始人口$N_0$} & \textbf{增长率r} \\
 \midrule
-14.52亿人 &5.4167亿人 &0.0285/年 \\
+15.7585亿人 &5.1358亿人 &0.0410/年 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -30,5 +61,5 @@
 拟合优度指标：
 \begin{itemize}
 \item $R^2=0.9976$
-\item RMSE=0.1194亿人
+\item RMSE=0.1194百万人
 \end{itemize}
